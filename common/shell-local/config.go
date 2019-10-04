@@ -55,14 +55,16 @@ type Config struct {
 
 	UseLinuxPathing bool `mapstructure:"use_linux_pathing"`
 
+	// used to track the data sent to shell-local from the builder
+	// GeneratedData
+
 	Ctx interpolate.Context
 }
 
 func Decode(config *Config, raws ...interface{}) error {
-	//Create passthrough for winrm password so we can fill it in once we know it
-	config.Ctx.Data = &EnvVarsTemplate{
-		WinRMPassword: `{{.WinRMPassword}}`,
-	}
+	// Create passthrough for build-generated data so we can fill it in once we know
+	// it
+	config.Ctx.Data = common.PlaceholderData()
 
 	err := configHelper.Decode(&config, &configHelper.DecodeOpts{
 		Interpolate:        true,
