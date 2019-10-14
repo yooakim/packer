@@ -74,12 +74,14 @@ type FlatConfig struct {
 	VMID                      *int              `mapstructure:"vm_id" cty:"vm_id"`
 	Memory                    *int              `mapstructure:"memory" cty:"memory"`
 	Cores                     *int              `mapstructure:"cores" cty:"cores"`
+	CPUType                   *string           `mapstructure:"cpu_type" cty:"cpu_type"`
 	Sockets                   *int              `mapstructure:"sockets" cty:"sockets"`
 	OS                        *string           `mapstructure:"os" cty:"os"`
 	NICs                      []FlatnicConfig   `mapstructure:"network_adapters" cty:"network_adapters"`
 	Disks                     []FlatdiskConfig  `mapstructure:"disks" cty:"disks"`
 	ISOFile                   *string           `mapstructure:"iso_file" cty:"iso_file"`
 	Agent                     *bool             `mapstructure:"qemu_agent" cty:"qemu_agent"`
+	SCSIController            *string           `mapstructure:"scsi_controller" cty:"scsi_controller"`
 	TemplateName              *string           `mapstructure:"template_name" cty:"template_name"`
 	TemplateDescription       *string           `mapstructure:"template_description" cty:"template_description"`
 	UnmountISO                *bool             `mapstructure:"unmount_iso" cty:"unmount_iso"`
@@ -159,12 +161,14 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"vm_id":                        &hcldec.AttrSpec{Name: "vm_id", Type: cty.Number, Required: false},
 		"memory":                       &hcldec.AttrSpec{Name: "memory", Type: cty.Number, Required: false},
 		"cores":                        &hcldec.AttrSpec{Name: "cores", Type: cty.Number, Required: false},
+		"cpu_type":                     &hcldec.AttrSpec{Name: "cpu_type", Type: cty.String, Required: false},
 		"sockets":                      &hcldec.AttrSpec{Name: "sockets", Type: cty.Number, Required: false},
 		"os":                           &hcldec.AttrSpec{Name: "os", Type: cty.String, Required: false},
 		"network_adapters":             &hcldec.BlockListSpec{TypeName: "network_adapters", Nested: &hcldec.BlockSpec{TypeName: "network_adapters", Nested: hcldec.ObjectSpec((*FlatnicConfig)(nil).HCL2Spec())}},
 		"disks":                        &hcldec.BlockListSpec{TypeName: "disks", Nested: &hcldec.BlockSpec{TypeName: "disks", Nested: hcldec.ObjectSpec((*FlatdiskConfig)(nil).HCL2Spec())}},
 		"iso_file":                     &hcldec.AttrSpec{Name: "iso_file", Type: cty.String, Required: false},
 		"qemu_agent":                   &hcldec.AttrSpec{Name: "qemu_agent", Type: cty.Bool, Required: false},
+		"scsi_controller":              &hcldec.AttrSpec{Name: "scsi_controller", Type: cty.String, Required: false},
 		"template_name":                &hcldec.AttrSpec{Name: "template_name", Type: cty.String, Required: false},
 		"template_description":         &hcldec.AttrSpec{Name: "template_description", Type: cty.String, Required: false},
 		"unmount_iso":                  &hcldec.AttrSpec{Name: "unmount_iso", Type: cty.Bool, Required: false},
