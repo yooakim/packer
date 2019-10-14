@@ -69,7 +69,7 @@ type Config struct {
 	ElevatedUser     string `mapstructure:"elevated_user"`
 	ElevatedPassword string `mapstructure:"elevated_password"`
 
-	ExecutionPolicy ExecutionPolicy `mapstructure:"execution_policy"`
+	ExecutionPolicy ExecutionPolicy `mapstructure:"execution_policy" mapstructure-to-hcl2:"execution_policy,self-defined"`
 
 	ctx interpolate.Context
 }

@@ -202,7 +202,7 @@ func outputStructHCL2SpecBody(w io.Writer, s *types.Struct) {
 		st, _ := structtag.Parse(tag)
 		ctyTag, _ := st.Get("cty")
 		fmt.Fprintf(w, "	\"%s\": ", ctyTag.Name)
-		outputHCL2SpecField(w, ctyTag.Name, field.Type())
+		outputHCL2SpecField(w, ctyTag.Name, field.Type(), st)
 		fmt.Fprintln(w, `,`)
 	}
 
@@ -210,10 +210,14 @@ func outputStructHCL2SpecBody(w io.Writer, s *types.Struct) {
 	fmt.Fprintln(w, `return s`)
 }
 
-func outputHCL2SpecField(w io.Writer, accessor string, fieldType types.Type) {
+func outputHCL2SpecField(w io.Writer, accessor string, fieldType types.Type, tag *structtag.Tags) {
+	if m2h, err := tag.Get(""); err == nil && m2h.HasOption("self-defined") {
+		fmt.Fprintf(w, `(&%s{}).HCL2Spec()`, fieldType.String())
+		return
+	}
 	switch f := fieldType.(type) {
 	case *types.Pointer:
-		outputHCL2SpecField(w, accessor, f.Elem())
+		outputHCL2SpecField(w, accessor, f.Elem(), tag)
 	case *types.Basic:
 		fmt.Fprintf(w, `%#v`, &hcldec.AttrSpec{
 			Name:     accessor,
@@ -240,14 +244,14 @@ func outputHCL2SpecField(w io.Writer, accessor string, fieldType types.Type) {
 			})
 		case *types.Named:
 			b := bytes.NewBuffer(nil)
-			outputHCL2SpecField(b, accessor, elem)
+			outputHCL2SpecField(b, accessor, elem, tag)
 			fmt.Fprintf(w, `&hcldec.BlockListSpec{TypeName: "%s", Nested: %s}`, accessor, b.String())
 		case *types.Slice:
 			b := bytes.NewBuffer(nil)
-			outputHCL2SpecField(b, accessor, elem.Underlying())
+			outputHCL2SpecField(b, accessor, elem.Underlying(), tag)
 			fmt.Fprintf(w, `&hcldec.BlockListSpec{TypeName: "%s", Nested: %s}`, accessor, b.String())
 		default:
-			outputHCL2SpecField(w, accessor, elem.Underlying())
+			outputHCL2SpecField(w, accessor, elem.Underlying(), tag)
 		}
 	case *types.Named:
 		underlyingType := f.Underlying()
@@ -256,7 +260,7 @@ func outputHCL2SpecField(w io.Writer, accessor string, fieldType types.Type) {
 			fmt.Fprintf(w, `&hcldec.BlockSpec{TypeName: "%s",`+
 				` Nested: hcldec.ObjectSpec((*%s)(nil).HCL2Spec())}`, accessor, f.String())
 		default:
-			outputHCL2SpecField(w, f.String(), underlyingType)
+			outputHCL2SpecField(w, f.String(), underlyingType, tag)
 		}
 	case *types.Struct:
 		fmt.Fprintf(w, `&hcldec.BlockObjectSpec{TypeName: "%s",`+
@@ -414,13 +418,6 @@ func getMapstructureSquashedStruct(topPkg *types.Package, utStruct *types.Struct
 			field = types.NewField(field.Pos(), topPkg, field.Name(), field.Type(), field.Embedded())
 		}
 		switch f := field.Type().(type) {
-		case *types.Slice:
-			if f, fNamed := f.Elem().(*types.Named); fNamed {
-				if str, isStruct := f.Underlying().(*types.Struct); isStruct {
-					obj := flattenNamed(f, str)
-					field = types.NewField(field.Pos(), field.Pkg(), field.Name(), types.NewSlice(obj), field.Embedded())
-				}
-			}
 		case *types.Named:
 			switch f.String() {
 			case "time.Duration":
@@ -432,6 +429,21 @@ func getMapstructureSquashedStruct(topPkg *types.Package, utStruct *types.Struct
 				obj := flattenNamed(f, str)
 				field = types.NewField(field.Pos(), field.Pkg(), field.Name(), obj, field.Embedded())
 				field = makePointer(field)
+			}
+			if slice, isSlice := f.Underlying().(*types.Slice); isSlice {
+				if f, fNamed := slice.Elem().(*types.Named); fNamed {
+					if str, isStruct := f.Underlying().(*types.Struct); isStruct {
+						obj := flattenNamed(f, str)
+						field = types.NewField(field.Pos(), field.Pkg(), field.Name(), types.NewSlice(obj), field.Embedded())
+					}
+				}
+			}
+		case *types.Slice:
+			if f, fNamed := f.Elem().(*types.Named); fNamed {
+				if str, isStruct := f.Underlying().(*types.Struct); isStruct {
+					obj := flattenNamed(f, str)
+					field = types.NewField(field.Pos(), field.Pkg(), field.Name(), types.NewSlice(obj), field.Embedded())
+				}
 			}
 		case *types.Basic:
 			// since everything is optional, everything must be a pointer

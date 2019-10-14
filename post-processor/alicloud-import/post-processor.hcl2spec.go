@@ -99,14 +99,6 @@ type FlatConfig struct {
 	WinRMInsecure                     *bool                        `mapstructure:"winrm_insecure" cty:"winrm_insecure"`
 	WinRMUseNTLM                      *bool                        `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm"`
 	SSHPrivateIp                      *bool                        `mapstructure:"ssh_private_ip" required:"false" cty:"ssh_private_ip"`
-	OSSBucket                         *string                      `mapstructure:"oss_bucket_name" cty:"oss_bucket_name"`
-	OSSKey                            *string                      `mapstructure:"oss_key_name" cty:"oss_key_name"`
-	SkipClean                         *bool                        `mapstructure:"skip_clean" cty:"skip_clean"`
-	OSType                            *string                      `mapstructure:"image_os_type" cty:"image_os_type"`
-	Platform                          *string                      `mapstructure:"image_platform" cty:"image_platform"`
-	Architecture                      *string                      `mapstructure:"image_architecture" cty:"image_architecture"`
-	Size                              *string                      `mapstructure:"image_system_size" cty:"image_system_size"`
-	Format                            *string                      `mapstructure:"format" cty:"format"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -207,14 +199,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_insecure":               &hcldec.AttrSpec{Name: "winrm_insecure", Type: cty.Bool, Required: false},
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"ssh_private_ip":               &hcldec.AttrSpec{Name: "ssh_private_ip", Type: cty.Bool, Required: false},
-		"oss_bucket_name":              &hcldec.AttrSpec{Name: "oss_bucket_name", Type: cty.String, Required: false},
-		"oss_key_name":                 &hcldec.AttrSpec{Name: "oss_key_name", Type: cty.String, Required: false},
-		"skip_clean":                   &hcldec.AttrSpec{Name: "skip_clean", Type: cty.Bool, Required: false},
-		"image_os_type":                &hcldec.AttrSpec{Name: "image_os_type", Type: cty.String, Required: false},
-		"image_platform":               &hcldec.AttrSpec{Name: "image_platform", Type: cty.String, Required: false},
-		"image_architecture":           &hcldec.AttrSpec{Name: "image_architecture", Type: cty.String, Required: false},
-		"image_system_size":            &hcldec.AttrSpec{Name: "image_system_size", Type: cty.String, Required: false},
-		"format":                       &hcldec.AttrSpec{Name: "format", Type: cty.String, Required: false},
 	}
 	return s
 }

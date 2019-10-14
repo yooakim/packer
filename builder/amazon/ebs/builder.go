@@ -26,6 +26,7 @@ import (
 const BuilderId = "mitchellh.amazonebs"
 
 type Config struct {
+	AMIMapEEEEEEEENGS      awscommon.BlockDevices `mapstructure:"ami_block_device_mappings_test" required:"false"`
 	common.PackerConfig    `mapstructure:",squash"`
 	awscommon.AccessConfig `mapstructure:",squash"`
 	awscommon.AMIConfig    `mapstructure:",squash"`

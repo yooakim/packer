@@ -180,6 +180,7 @@ type Variable struct {
 	Key      string
 	Default  string
 	Required bool
+	Sensible bool
 }
 
 func (v *Variable) MarshalJSON() ([]byte, error) {

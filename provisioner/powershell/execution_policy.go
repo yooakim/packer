@@ -4,6 +4,9 @@ package powershell
 
 import (
 	"reflect"
+
+	"github.com/hashicorp/hcl/v2/hcldec"
+	"github.com/zclconf/go-cty/cty"
 )
 
 // ExecutionPolicy setting to run the command(s).
@@ -28,4 +31,8 @@ func StringToExecutionPolicyHook(f reflect.Kind, t reflect.Kind, data interface{
 
 	raw := data.(string)
 	return ExecutionPolicyString(raw)
+}
+
+func (*ExecutionPolicy) HCL2Spec() *hcldec.AttrSpec {
+	return &hcldec.AttrSpec{Name: "execution_policy", Type: cty.String, Required: false}
 }

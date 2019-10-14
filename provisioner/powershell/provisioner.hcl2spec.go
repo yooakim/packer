@@ -31,7 +31,7 @@ type FlatConfig struct {
 	ElevatedEnvVarFormat   *string           `mapstructure:"elevated_env_var_format" cty:"elevated_env_var_format"`
 	ElevatedUser           *string           `mapstructure:"elevated_user" cty:"elevated_user"`
 	ElevatedPassword       *string           `mapstructure:"elevated_password" cty:"elevated_password"`
-	ExecutionPolicy        ExecutionPolicy   `mapstructure:"execution_policy" hcl2-schema-generator:"execution_policy,direct" cty:"execution_policy"`
+	ExecutionPolicy        ExecutionPolicy   `mapstructure:"execution_policy" mapstructure-to-hcl2:"execution_policy,self-defined" cty:"execution_policy"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
