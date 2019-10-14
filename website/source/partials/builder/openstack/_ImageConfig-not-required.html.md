@@ -2,7 +2,7 @@
 
 -   `metadata` (map[string]string) - Glance metadata that will be applied to the image.
     
--   `image_visibility` (imageservice.ImageVisibility) - One of "public", "private", "shared", or "community".
+-   `image_visibility` (string) - One of "public", "private", "shared", or "community".
     
 -   `image_members` ([]string) - List of members to add to the image after creation. An image member is
     usually a project (also called the "tenant") with whom the image is
